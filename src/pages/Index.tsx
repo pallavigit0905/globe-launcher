@@ -2,10 +2,10 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import EarthGlobe from "@/components/EarthGlobe";
 import LoginForm from "@/components/LoginForm";
-import AppGrid from "@/components/AppGrid";
 
 const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [selectedApp, setSelectedApp] = useState<string | null>(null);
 
   return (
     <div className="relative min-h-screen bg-background star-field overflow-hidden flex flex-col items-center justify-center">
@@ -23,10 +23,8 @@ const Index = () => {
             transition={{ duration: 0.5 }}
             className="flex flex-col items-center w-full max-w-sm px-6"
           >
-            {/* Globe */}
             <EarthGlobe className="w-64 h-64 mb-2" />
 
-            {/* Title */}
             <motion.h1
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -44,7 +42,6 @@ const Index = () => {
               Your world, at your fingertips
             </motion.p>
 
-            {/* Login Form */}
             <LoginForm onLogin={() => setIsLoggedIn(true)} />
           </motion.div>
         ) : (
@@ -53,13 +50,13 @@ const Index = () => {
             initial={{ opacity: 0, scale: 1.05 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="flex flex-col items-center w-full max-w-sm px-4"
+            className="flex flex-col items-center w-full h-screen"
           >
-            {/* Status bar area */}
+            {/* Status bar */}
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="w-full flex items-center justify-between px-2 py-3"
+              className="w-full flex items-center justify-between px-6 py-3 z-10"
             >
               <span className="text-xs text-muted-foreground font-medium">9:41</span>
               <div className="flex items-center gap-1">
@@ -69,32 +66,41 @@ const Index = () => {
               </div>
             </motion.div>
 
-            {/* Globe smaller on home */}
-            <EarthGlobe className="w-48 h-48 mb-4" />
-
-            <motion.h2
+            {/* Instruction */}
+            <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="text-lg font-semibold text-foreground glow-text mb-4"
+              className="text-xs text-muted-foreground mb-1 z-10"
             >
-              Your Apps
-            </motion.h2>
+              Rotate the globe to find your apps
+            </motion.p>
 
-            {/* App Grid */}
-            <AppGrid />
+            {/* Globe takes up most of the screen */}
+            <div className="flex-1 w-full relative">
+              <EarthGlobe
+                className="w-full h-full"
+                interactive
+                onSelectApp={setSelectedApp}
+                selectedApp={selectedApp}
+              />
+            </div>
 
-            {/* Bottom bar */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 }}
-              className="fixed bottom-6 left-1/2 -translate-x-1/2 glass rounded-2xl px-6 py-3 flex items-center gap-6 glow-border"
-            >
-              <button className="text-primary text-xl">📱</button>
-              <button className="text-muted-foreground text-xl hover:text-primary transition-colors">🔍</button>
-              <button className="text-muted-foreground text-xl hover:text-primary transition-colors">⚙️</button>
-            </motion.div>
+            {/* Selected app toast */}
+            <AnimatePresence>
+              {selectedApp && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  className="fixed bottom-8 left-1/2 -translate-x-1/2 glass rounded-2xl px-6 py-3 glow-border z-20"
+                >
+                  <p className="text-foreground text-sm font-medium">
+                    Opening <span className="text-primary">{selectedApp}</span>…
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>
