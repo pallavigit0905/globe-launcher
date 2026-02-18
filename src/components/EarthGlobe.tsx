@@ -2,33 +2,7 @@ import { useRef, useMemo, useState, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Sphere, Html } from "@react-three/drei";
 import * as THREE from "three";
-
-const appIcons = [
-  { name: "Messages", emoji: "💬", color: "#22d3ee" },
-  { name: "Camera", emoji: "📷", color: "#f472b6" },
-  { name: "Music", emoji: "🎵", color: "#a78bfa" },
-  { name: "Weather", emoji: "🌤", color: "#fbbf24" },
-  { name: "Maps", emoji: "🗺", color: "#34d399" },
-  { name: "Calendar", emoji: "📅", color: "#f87171" },
-  { name: "Notes", emoji: "📝", color: "#fb923c" },
-  { name: "Health", emoji: "❤️", color: "#ec4899" },
-  { name: "Photos", emoji: "🖼", color: "#60a5fa" },
-  { name: "Settings", emoji: "⚙️", color: "#94a3b8" },
-  { name: "Mail", emoji: "✉️", color: "#2dd4bf" },
-  { name: "Clock", emoji: "⏰", color: "#e879f9" },
-  { name: "Wallet", emoji: "💳", color: "#4ade80" },
-  { name: "Store", emoji: "🛍", color: "#38bdf8" },
-  { name: "News", emoji: "📰", color: "#f59e0b" },
-  { name: "Phone", emoji: "📞", color: "#10b981" },
-  { name: "Video", emoji: "🎬", color: "#ef4444" },
-  { name: "Browser", emoji: "🌐", color: "#6366f1" },
-  { name: "Games", emoji: "🎮", color: "#8b5cf6" },
-  { name: "Fitness", emoji: "🏋️", color: "#14b8a6" },
-  { name: "Books", emoji: "📚", color: "#f97316" },
-  { name: "Translate", emoji: "🌍", color: "#0ea5e9" },
-  { name: "Podcast", emoji: "🎙", color: "#d946ef" },
-  { name: "Files", emoji: "📁", color: "#64748b" },
-];
+import { appList } from "@/data/apps";
 
 function AppIconOnGlobe({
   position,
@@ -139,7 +113,7 @@ function GlobeWithApps({
 }) {
   // Fibonacci sphere distribution
   const iconPositions = useMemo(() => {
-    const n = appIcons.length;
+    const n = appList.length;
     const positions: [number, number, number][] = [];
     const goldenRatio = (1 + Math.sqrt(5)) / 2;
     const radius = 1.15;
@@ -182,7 +156,7 @@ function GlobeWithApps({
       </Sphere>
 
       {/* App icons */}
-      {appIcons.map((app, i) => (
+      {appList.map((app, i) => (
         <AppIconOnGlobe
           key={app.name}
           position={iconPositions[i]}
