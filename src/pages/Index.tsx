@@ -2,10 +2,12 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import EarthGlobe from "@/components/EarthGlobe";
 import LoginForm from "@/components/LoginForm";
+import OnboardingTour from "@/components/OnboardingTour";
 
 const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [selectedApp, setSelectedApp] = useState<string | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(true);
 
   return (
     <div className="relative min-h-screen bg-background star-field overflow-hidden flex flex-col items-center justify-center">
@@ -99,6 +101,13 @@ const Index = () => {
                     Opening <span className="text-primary">{selectedApp}</span>…
                   </p>
                 </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Onboarding tour */}
+            <AnimatePresence>
+              {showOnboarding && (
+                <OnboardingTour onComplete={() => setShowOnboarding(false)} />
               )}
             </AnimatePresence>
           </motion.div>
