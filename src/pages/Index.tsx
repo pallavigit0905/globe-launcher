@@ -1,13 +1,24 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import EarthGlobe from "@/components/EarthGlobe";
 import LoginForm from "@/components/LoginForm";
 import OnboardingTour from "@/components/OnboardingTour";
+import { appList } from "@/data/apps";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [selectedApp, setSelectedApp] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(true);
+
+  const handleSelectApp = useCallback((name: string) => {
+    setSelectedApp(name);
+    const app = appList.find((a) => a.name === name);
+    if (app) {
+      setTimeout(() => navigate(`/app/${app.slug}`), 600);
+    }
+  }, [navigate]);
 
   return (
     <div className="relative min-h-screen bg-background star-field overflow-hidden flex flex-col items-center justify-center">
@@ -83,7 +94,7 @@ const Index = () => {
               <EarthGlobe
                 className="w-full h-full"
                 interactive
-                onSelectApp={setSelectedApp}
+                onSelectApp={handleSelectApp}
                 selectedApp={selectedApp}
               />
             </div>
