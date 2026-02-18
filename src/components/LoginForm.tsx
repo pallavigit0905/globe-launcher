@@ -80,7 +80,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 
       <p className="text-center text-muted-foreground text-xs">
         Don't have an account?{" "}
-        <button type="button" className="text-primary hover:underline">
+        <button type="button" onClick={onLogin} className="text-primary hover:underline">
           Sign Up
         </button>
       </p>
