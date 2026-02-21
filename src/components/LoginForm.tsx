@@ -1,19 +1,46 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Fingerprint } from "lucide-react";
+import { Eye, EyeOff, Fingerprint, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
-interface LoginFormProps {
-  onLogin: () => void;
-}
-
-export default function LoginForm({ onLogin }: LoginFormProps) {
+export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin();
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    setLoading(true);
+
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { display_name: displayName || email },
+          emailRedirectTo: window.location.origin,
+        },
+      });
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Check your email to confirm your account!");
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        toast.error(error.message);
+      }
+    }
+    setLoading(false);
   };
 
   return (
@@ -25,6 +52,17 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
       className="w-full max-w-xs space-y-4"
     >
       <div className="space-y-3">
+        {isSignUp && (
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Display Name"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl glass text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 glow-border transition-all"
+            />
+          </div>
+        )}
         <div className="relative">
           <input
             type="email"
@@ -54,34 +92,23 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 
       <motion.button
         type="submit"
+        disabled={loading}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm glow-box hover:brightness-110 transition-all"
+        className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm glow-box hover:brightness-110 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
       >
-        Sign In
-      </motion.button>
-
-      <div className="flex items-center gap-3 px-4">
-        <div className="flex-1 h-px bg-border" />
-        <span className="text-muted-foreground text-xs">or</span>
-        <div className="flex-1 h-px bg-border" />
-      </div>
-
-      <motion.button
-        type="button"
-        onClick={onLogin}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        className="w-full py-3 rounded-xl glass glow-border text-foreground font-medium text-sm flex items-center justify-center gap-2 hover:bg-secondary/50 transition-all"
-      >
-        <Fingerprint size={18} className="text-primary" />
-        Use Biometrics
+        {loading && <Loader2 size={16} className="animate-spin" />}
+        {isSignUp ? "Sign Up" : "Sign In"}
       </motion.button>
 
       <p className="text-center text-muted-foreground text-xs">
-        Don't have an account?{" "}
-        <button type="button" onClick={onLogin} className="text-primary hover:underline">
-          Sign Up
+        {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+        <button
+          type="button"
+          onClick={() => setIsSignUp(!isSignUp)}
+          className="text-primary hover:underline"
+        >
+          {isSignUp ? "Sign In" : "Sign Up"}
         </button>
       </p>
     </motion.form>
