@@ -8,6 +8,7 @@ function AppIconOnGlobe({
   position,
   color,
   emoji,
+  icon,
   name,
   onSelect,
   isSelected,
@@ -15,6 +16,7 @@ function AppIconOnGlobe({
   position: [number, number, number];
   color: string;
   emoji: string;
+  icon?: string;
   name: string;
   onSelect: () => void;
   isSelected: boolean;
@@ -79,7 +81,11 @@ function AppIconOnGlobe({
             gap: "1px",
             pointerEvents: "none",
           }}>
-            <span style={{ fontSize: "16px", lineHeight: 1 }}>{emoji}</span>
+            {icon ? (
+              <img src={icon} alt={name} style={{ width: 18, height: 18, objectFit: "contain" }} />
+            ) : (
+              <span style={{ fontSize: "16px", lineHeight: 1 }}>{emoji}</span>
+            )}
             <span style={{
               fontSize: "7px",
               color: "hsl(195, 100%, 90%)",
@@ -162,6 +168,7 @@ function GlobeWithApps({
           position={iconPositions[i]}
           color={app.color}
           emoji={app.emoji}
+          icon={app.icon}
           name={app.name}
           onSelect={() => onSelectApp(app.name)}
           isSelected={selectedApp === app.name}
