@@ -31,6 +31,8 @@ export const appList: AppInfo[] = [
   { name: "Translate", emoji: "🌍", color: "#0ea5e9", slug: "translate", description: "Translate text between languages." },
   { name: "Podcast", emoji: "🎙", color: "#d946ef", slug: "podcast", description: "Listen to your favorite podcasts." },
   { name: "Files", emoji: "📁", color: "#64748b", slug: "files", description: "Manage and organize your files." },
+  { name: "Zoom", emoji: "📹", color: "#2D8CFF", slug: "zoom", description: "Host and join video meetings instantly." },
+  { name: "Jira", emoji: "🎯", color: "#0052CC", slug: "jira", description: "Track issues, manage projects, and plan sprints." },
 ];
 
 export function getAppBySlug(slug: string): AppInfo | undefined {
