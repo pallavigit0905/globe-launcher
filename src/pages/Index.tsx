@@ -1,14 +1,16 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { LogOut } from "lucide-react";
 import EarthGlobe from "@/components/EarthGlobe";
 import LoginForm from "@/components/LoginForm";
 import OnboardingTour from "@/components/OnboardingTour";
+import { useAuth } from "@/contexts/AuthContext";
 import { appList } from "@/data/apps";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, loading, signOut } = useAuth();
   const [selectedApp, setSelectedApp] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(true);
 
@@ -20,6 +22,14 @@ const Index = () => {
     }
   }, [navigate]);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background star-field flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="relative min-h-screen bg-background star-field overflow-hidden flex flex-col items-center justify-center">
       {/* Ambient glow effects */}
@@ -27,7 +37,7 @@ const Index = () => {
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-glow-secondary/5 blur-[80px] pointer-events-none" />
 
       <AnimatePresence mode="wait">
-        {!isLoggedIn ? (
+        {!user ? (
           <motion.div
             key="login"
             initial={{ opacity: 0 }}
@@ -55,7 +65,7 @@ const Index = () => {
               Your world, at your fingertips
             </motion.p>
 
-            <LoginForm onLogin={() => setIsLoggedIn(true)} />
+            <LoginForm />
           </motion.div>
         ) : (
           <motion.div
@@ -65,18 +75,19 @@ const Index = () => {
             transition={{ duration: 0.5 }}
             className="flex flex-col items-center w-full h-screen"
           >
-            {/* Status bar */}
+            {/* Status bar with logout */}
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               className="w-full flex items-center justify-between px-6 py-3 z-10"
             >
               <span className="text-xs text-muted-foreground font-medium">9:41</span>
-              <div className="flex items-center gap-1">
-                <div className="w-4 h-2.5 rounded-sm border border-foreground/40 relative">
-                  <div className="absolute inset-0.5 bg-primary rounded-[1px]" />
-                </div>
-              </div>
+              <button
+                onClick={signOut}
+                className="w-8 h-8 rounded-full glass glow-border flex items-center justify-center hover:bg-secondary/50 transition-colors"
+              >
+                <LogOut className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
             </motion.div>
 
             {/* Instruction */}
@@ -89,7 +100,7 @@ const Index = () => {
               Rotate the globe to find your apps
             </motion.p>
 
-            {/* Globe takes up most of the screen */}
+            {/* Globe */}
             <div className="flex-1 w-full relative">
               <EarthGlobe
                 className="w-full h-full"
