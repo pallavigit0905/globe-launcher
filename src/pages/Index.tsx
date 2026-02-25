@@ -8,7 +8,7 @@ import { appList } from "@/data/apps";
 const Index = () => {
   const navigate = useNavigate();
   const [selectedApp, setSelectedApp] = useState<string | null>(null);
-  const [showOnboarding, setShowOnboarding] = useState(true);
+  
 
   const handleSelectApp = useCallback((name: string) => {
     setSelectedApp(name);
@@ -62,11 +62,6 @@ const Index = () => {
           )}
         </AnimatePresence>
 
-        <AnimatePresence>
-          {showOnboarding && (
-            <OnboardingTour onComplete={() => setShowOnboarding(false)} />
-          )}
-        </AnimatePresence>
       </motion.div>
     </div>
   );
