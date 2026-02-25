@@ -1,19 +1,37 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 import EarthGlobe from "@/components/EarthGlobe";
-import OnboardingTour from "@/components/OnboardingTour";
 import { appList } from "@/data/apps";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const navigate = useNavigate();
   const [selectedApp, setSelectedApp] = useState<string | null>(null);
-  
 
-  const handleSelectApp = useCallback((name: string) => {
+  const handleSelectApp = useCallback(async (name: string) => {
     setSelectedApp(name);
     const app = appList.find((a) => a.name === name);
-    if (app) {
+    if (!app) return;
+
+    if (app.apiUrl) {
+      try {
+        toast.info(`Calling ${app.name} API…`);
+        const { data, error } = await supabase.functions.invoke("app-proxy", {
+          body: { apiUrl: app.apiUrl, method: "GET" },
+        });
+        if (error) throw error;
+        console.log(`${app.name} API response:`, data);
+        toast.success(`${app.name} API responded successfully`);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Unknown error";
+        console.error(`${app.name} API error:`, msg);
+        toast.error(`${app.name} API failed: ${msg}`);
+      } finally {
+        setSelectedApp(null);
+      }
+    } else {
       setTimeout(() => navigate(`/app/${app.slug}`), 600);
     }
   }, [navigate]);
