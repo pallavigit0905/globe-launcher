@@ -7,6 +7,8 @@ export interface AppInfo {
   color: string;
   slug: string;
   description: string;
+  /** Component type to render on the app page */
+  appType?: "zoom" | "jira" | "search-project";
 }
 
 export const appList: AppInfo[] = [
@@ -14,9 +16,10 @@ export const appList: AppInfo[] = [
   { name: "Gmail", emoji: "✉️", color: "#EA4335", slug: "gmail", description: "Send and receive emails with Gmail." },
   { name: "Workchat", emoji: "💬", color: "#7B83EB", slug: "workchat", description: "Chat and collaborate with your team." },
   { name: "Sharepoint", emoji: "📂", color: "#038387", slug: "sharepoint", description: "Share and manage documents across teams." },
-  { name: "Zoom", emoji: "📹", icon: zoomLogo, color: "#2D8CFF", slug: "zoom", description: "Host and join video meetings instantly." },
+  { name: "Zoom", emoji: "📹", icon: zoomLogo, color: "#2D8CFF", slug: "zoom", description: "Host and join video meetings instantly.", appType: "zoom" },
+  { name: "Jira", emoji: "🎯", color: "#0052CC", slug: "jira", description: "Track issues, manage projects, and plan sprints.", appType: "jira" },
   { name: "Foundry Select", emoji: "🔧", color: "#6C5CE7", slug: "foundry-select", description: "Select and configure foundry tools." },
-  { name: "Search-the-Project", emoji: "🔍", color: "#F39C12", slug: "search-the-project", description: "Search across all project resources." },
+  { name: "Search-the-Project", emoji: "🔍", color: "#F39C12", slug: "search-the-project", description: "Search across all project resources.", appType: "search-project" },
   { name: "Schedules", emoji: "📅", color: "#27AE60", slug: "schedules", description: "View and manage project schedules." },
   { name: "Regressions", emoji: "📉", color: "#E74C3C", slug: "regressions", description: "Track and analyze regression data." },
   { name: "PPA Trends", emoji: "📊", color: "#8E44AD", slug: "ppa-trends", description: "Monitor PPA trend analytics." },
