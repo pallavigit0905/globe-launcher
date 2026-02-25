@@ -8,7 +8,6 @@ export interface AppInfo {
   color: string;
   slug: string;
   description: string;
-  apiUrl?: string;
 }
 
 export const appList: AppInfo[] = [
@@ -36,7 +35,7 @@ export const appList: AppInfo[] = [
   { name: "Translate", emoji: "🌍", color: "#0ea5e9", slug: "translate", description: "Translate text between languages." },
   { name: "Podcast", emoji: "🎙", color: "#d946ef", slug: "podcast", description: "Listen to your favorite podcasts." },
   { name: "Files", emoji: "📁", color: "#64748b", slug: "files", description: "Manage and organize your files." },
-  { name: "Zoom", emoji: "📹", icon: zoomLogo, color: "#2D8CFF", slug: "zoom", description: "Host and join video meetings instantly.", apiUrl: "https://api.zoom.us/v2/users/me/meetings" },
+  { name: "Zoom", emoji: "📹", icon: zoomLogo, color: "#2D8CFF", slug: "zoom", description: "Host and join video meetings instantly." },
   { name: "Jira", emoji: "🎯", icon: jiraLogo, color: "#0052CC", slug: "jira", description: "Track issues, manage projects, and plan sprints." },
 ];
 
