@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function ZoomApp() {
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState("09:00");
+  const [duration, setDuration] = useState("30");
   const [topic, setTopic] = useState("");
   const [loading, setLoading] = useState(false);
   const [meetingLink, setMeetingLink] = useState<string | null>(null);
@@ -34,7 +35,7 @@ export default function ZoomApp() {
       // });
       await new Promise((r) => setTimeout(r, 1500));
       setMeetingLink("https://zoom.us/j/1234567890?pwd=example");
-      toast({ title: "Meeting created!", description: `${topic} scheduled for ${format(date, "PPP")} at ${time}` });
+      toast({ title: "Meeting created!", description: `${topic} scheduled for ${format(date, "PPP")} at ${time} (${duration} min)` });
     } catch {
       toast({ title: "Error", description: "Failed to create meeting. Please try again.", variant: "destructive" });
     } finally {
@@ -101,6 +102,23 @@ export default function ZoomApp() {
               onChange={(e) => setTime(e.target.value)}
               className="bg-secondary/50 border-border"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="duration">Duration (minutes)</Label>
+            <select
+              id="duration"
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              className="flex h-10 w-full rounded-md border border-input bg-secondary/50 px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              <option value="15">15 min</option>
+              <option value="30">30 min</option>
+              <option value="45">45 min</option>
+              <option value="60">1 hour</option>
+              <option value="90">1.5 hours</option>
+              <option value="120">2 hours</option>
+            </select>
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
