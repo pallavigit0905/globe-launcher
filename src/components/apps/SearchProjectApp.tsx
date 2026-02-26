@@ -1,21 +1,15 @@
 import { useState } from "react";
-import { Search, Loader2, FileText } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
-interface SearchResult {
-  id: string;
-  title: string;
-  type: string;
-  snippet: string;
-}
-
 export default function SearchProjectApp() {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<SearchResult[] | null>(null);
+  const [response, setResponse] = useState<Record<string, unknown> | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,18 +20,22 @@ export default function SearchProjectApp() {
     }
 
     setLoading(true);
-    setResults(null);
+    setResponse(null);
+    setError(null);
 
     try {
-      // TODO: Replace with actual edge function call
-      await new Promise((r) => setTimeout(r, 1000));
-      setResults([
-        { id: "1", title: `${query} - Design Spec`, type: "Document", snippet: "Architecture overview and design decisions for the project…" },
-        { id: "2", title: `${query} - Sprint Board`, type: "Board", snippet: "Current sprint tasks and backlog items…" },
-        { id: "3", title: `${query} - API Docs`, type: "Wiki", snippet: "REST API documentation and endpoint references…" },
-      ]);
-    } catch {
-      toast({ title: "Error", description: "Search failed. Please try again.", variant: "destructive" });
+      const res = await fetch(
+        `http://127.0.0.1:8000/datapath_power?params=${encodeURIComponent(query.trim())}`
+      );
+      if (!res.ok) {
+        throw new Error(`Server responded with ${res.status}`);
+      }
+      const data = await res.json();
+      setResponse(data);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Search failed. Please try again.";
+      setError(message);
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -74,22 +72,31 @@ export default function SearchProjectApp() {
           </Button>
         </form>
 
-        {results && (
+        {error && !loading && (
+          <div className="mt-6 p-4 rounded-xl bg-destructive/10 border border-destructive/30 text-destructive text-sm">
+            {error}
+          </div>
+        )}
+
+        {response && (
           <div className="mt-6 space-y-2">
-            {results.length === 0 ? (
-              <p className="text-muted-foreground text-sm text-center py-4">No results found.</p>
-            ) : (
-              results.map((r) => (
-                <div key={r.id} className="p-3 rounded-xl bg-secondary/40 border border-border hover:bg-secondary/60 transition-colors cursor-pointer">
-                  <div className="flex items-center gap-2 mb-1">
-                    <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
-                    <span className="text-foreground text-sm font-medium truncate">{r.title}</span>
-                    <span className="text-xs text-muted-foreground ml-auto shrink-0">{r.type}</span>
-                  </div>
-                  <p className="text-muted-foreground text-xs pl-6 line-clamp-2">{r.snippet}</p>
-                </div>
-              ))
-            )}
+            <h3 className="text-foreground text-sm font-semibold">Results</h3>
+            <div className="p-4 rounded-xl bg-secondary/40 border border-border overflow-auto max-h-80">
+              {typeof response === "object" ? (
+                <dl className="space-y-2 text-sm">
+                  {Object.entries(response).map(([key, value]) => (
+                    <div key={key} className="flex gap-2">
+                      <dt className="text-muted-foreground font-medium min-w-[120px] shrink-0">{key}:</dt>
+                      <dd className="text-foreground break-all">
+                        {typeof value === "object" ? JSON.stringify(value, null, 2) : String(value)}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : (
+                <pre className="text-foreground text-xs whitespace-pre-wrap">{JSON.stringify(response, null, 2)}</pre>
+              )}
+            </div>
           </div>
         )}
       </div>
