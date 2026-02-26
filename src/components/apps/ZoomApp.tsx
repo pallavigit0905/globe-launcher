@@ -15,7 +15,8 @@ export default function ZoomApp() {
   const [duration, setDuration] = useState("30");
   const [topic, setTopic] = useState("");
   const [loading, setLoading] = useState(false);
-  const [meetingLink, setMeetingLink] = useState<string | null>(null);
+  const [meetingResult, setMeetingResult] = useState<{ id: string; join_url: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,18 +27,29 @@ export default function ZoomApp() {
     }
 
     setLoading(true);
-    setMeetingLink(null);
+    setMeetingResult(null);
+    setError(null);
+
+    // Combine date + time into ISO 8601
+    const [hours, minutes] = time.split(":").map(Number);
+    const startDate = new Date(date);
+    startDate.setHours(hours, minutes, 0, 0);
+    const start_time = startDate.toISOString().replace(/\.\d{3}Z$/, "Z");
 
     try {
-      // TODO: Replace with actual edge function call
-      // const { data } = await supabase.functions.invoke("app-proxy", {
-      //   body: { app: "zoom", action: "create-meeting", topic, date: date.toISOString(), time },
-      // });
-      await new Promise((r) => setTimeout(r, 1500));
-      setMeetingLink("https://zoom.us/j/1234567890?pwd=example");
+      const res = await fetch("http://127.0.0.1:8000/zoom/create-meeting", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic: topic.trim(), start_time, duration }),
+      });
+      if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+      const data = await res.json();
+      setMeetingResult({ id: data.id ?? data.meeting_id, join_url: data.join_url ?? data.join_link });
       toast({ title: "Meeting created!", description: `${topic} scheduled for ${format(date, "PPP")} at ${time} (${duration} min)` });
-    } catch {
-      toast({ title: "Error", description: "Failed to create meeting. Please try again.", variant: "destructive" });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to create meeting.";
+      setError(message);
+      toast({ title: "Error", description: message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -127,16 +139,23 @@ export default function ZoomApp() {
           </Button>
         </form>
 
-        {meetingLink && (
-          <div className="mt-6 p-4 rounded-xl bg-primary/10 border border-primary/20">
-            <p className="text-foreground text-sm font-medium mb-2">✅ Meeting Created</p>
+        {error && !loading && (
+          <div className="mt-6 p-4 rounded-xl bg-destructive/10 border border-destructive/30 text-destructive text-sm">
+            {error}
+          </div>
+        )}
+
+        {meetingResult && (
+          <div className="mt-6 p-4 rounded-xl bg-primary/10 border border-primary/20 space-y-2">
+            <p className="text-foreground text-sm font-medium">✅ Meeting Created</p>
+            <p className="text-muted-foreground text-xs">Meeting ID: <span className="text-foreground font-mono">{meetingResult.id}</span></p>
             <a
-              href={meetingLink}
+              href={meetingResult.join_url}
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary text-sm flex items-center gap-1 hover:underline break-all"
             >
-              {meetingLink} <ExternalLink className="w-3 h-3 shrink-0" />
+              {meetingResult.join_url} <ExternalLink className="w-3 h-3 shrink-0" />
             </a>
           </div>
         )}
