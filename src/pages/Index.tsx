@@ -2,7 +2,6 @@ import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import EarthGlobe from "@/components/EarthGlobe";
-import OnboardingTour from "@/components/OnboardingTour";
 import { appList } from "@/data/apps";
 
 const Index = () => {
